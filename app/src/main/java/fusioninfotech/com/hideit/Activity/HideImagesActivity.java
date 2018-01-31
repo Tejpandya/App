@@ -32,7 +32,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -153,6 +152,9 @@ public class HideImagesActivity extends AppCompatActivity {
                         for (int i = (selected.size() - 1); i >= 0; i--) {
                             if (selected.valueAt(i)) {
                                 storeImage(imageAdapter.getItem(selected.keyAt(i)));
+                                DeletefromData(selected.keyAt(i));
+
+                                imageAdapter.notifyDataSetChanged();
                             }
                         }
                         actionMode.finish();
@@ -183,6 +185,23 @@ public class HideImagesActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    private void DeletefromData(int position){
+
+        File root_file = new File(myDir + "/decrypted/images/");
+        File root_file_encrypt = new File(myDir + "/encrypted/images/");
+        File[] files = root_file.listFiles();
+        File[] files_encrypt = root_file_encrypt.listFiles();
+
+
+        if (root_file.listFiles() != null) {
+            boolean isdelete =  files[position].delete();
+            files_encrypt[position].delete();
+            System.out.println("is delete "+isdelete);
+            array_bitmap.remove(position);
+        }
     }
 
 
@@ -613,7 +632,7 @@ public class HideImagesActivity extends AppCompatActivity {
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
-                String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
+                String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmssSSS").format(new Date());
                 File mediaFile;
                 String mImageName = "MI_" + timeStamp + ".jpg";
                 mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
@@ -622,7 +641,7 @@ public class HideImagesActivity extends AppCompatActivity {
             }
         }
         // Create a media file name
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmssSSS").format(new Date());
         File mediaFile;
         String mImageName = "MI_" + timeStamp + ".jpg";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);

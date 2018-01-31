@@ -2,6 +2,7 @@ package fusioninfotech.com.hideit.databaseHelper;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.Query;
 
 import java.util.List;
 
@@ -18,5 +19,7 @@ public interface DaoAccessSms {
     @Insert
     void insertMultipleSmsList(List<SMSData> list_sms);
 
+    @Query("SELECT * FROM SMSData")
+    List<SMSData> fetchAllData();
 
 }

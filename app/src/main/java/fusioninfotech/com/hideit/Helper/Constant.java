@@ -17,5 +17,5 @@ public class Constant {
     public static List<SMSData> Constant_list_sms_model = new ArrayList<>();
     public static  ArrayList<Boolean> positionArray ;
     public static List<String> list_blocked_apps = new ArrayList<String>();
-    public  static  boolean is_complete = false;
+
 }

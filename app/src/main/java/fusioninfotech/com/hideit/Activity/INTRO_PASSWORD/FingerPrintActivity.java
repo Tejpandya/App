@@ -26,7 +26,7 @@ public class FingerPrintActivity extends AppCompatActivity implements FingerPrin
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finger_print);
 
-
+        
         mFingerPrintAuthHelper = FingerPrintAuthHelper.getHelper(this,this);
 
 

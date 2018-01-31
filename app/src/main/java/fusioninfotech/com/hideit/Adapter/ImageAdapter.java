@@ -56,7 +56,7 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-
+        System.out.println("my bitmap adapter and position "+array_bitmap.get(position) +" "+position);
          holder.img_gallery.setImageBitmap(array_bitmap.get(position));
 
         return convertView;

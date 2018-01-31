@@ -17,9 +17,15 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.GridView;
 import android.support.design.widget.FloatingActionButton;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -135,7 +141,150 @@ public class HideDocumentActivity extends AppCompatActivity {
 
         loadOldData();
 
+
+        gridView.setChoiceMode(gridView.CHOICE_MODE_MULTIPLE_MODAL);
+        gridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+
+                int checkedCount = gridView.getCheckedItemCount();
+                actionMode.setTitle(checkedCount + " selected");
+                documentAdapter.toggleSelection(i);
+
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                actionMode.getMenuInflater().inflate(R.menu.restore_menu, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.restoreitem:
+
+                        new StoreImage().execute();
+
+                        actionMode.finish();
+
+
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode actionMode) {
+
+            }
+        });
+
+
     }
+
+    private void DeletefromData(int position){
+
+        System.out.println("my position "+position);
+
+        File root_file = new File(myDir + "/decrypted/documents/");
+        File root_file_encrypt = new File(myDir + "/encrypted/documents/");
+        File[] files = root_file.listFiles();
+        File[] files_encrypt = root_file_encrypt.listFiles();
+
+        System.out.println("file size "+files.length);
+        System.out.println("file encrypt size "+files_encrypt.length);
+
+
+        if (root_file.listFiles() != null) {
+            boolean isdelete =  files[position].delete();
+            files_encrypt[position].delete();
+            System.out.println("is delete "+isdelete);
+            array_filename.remove(position);
+
+
+        }
+    }
+
+    private void storeImage(byte[] content, String extension) {
+
+        File pictureFile = getOutputMediaFile(extension);
+        if (pictureFile == null) {
+            Toast.makeText(this, "Errorr ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            fos.write(content);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            Log.d("photo", "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d("photo", "Error accessing file: " + e.getMessage());
+        }
+    }
+
+
+    public class StoreImage extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+
+            SparseBooleanArray selected = documentAdapter.getSelectedIds();
+            for (int i = (selected.size() - 1); i >= 0; i--) {
+
+                if (selected.valueAt(i)) {
+                    File root_file = new File(myDir + "/decrypted/documents/");
+
+                    File[] files = root_file.listFiles();
+
+                    System.out.println("file array size " + files.length);
+
+                    System.out.println("my file" + Uri.fromFile(files[i]));
+
+
+                    byte[] content = getFile(getPath(HideDocumentActivity.this, Uri.fromFile(files[i])));
+                    System.out.println(content);
+
+                    storeImage(content,array_filename.get(i).toString().substring(array_filename.get(i).toString().lastIndexOf(".")));
+
+
+
+                    DeletefromData(selected.keyAt(i));
+
+                }
+            }
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            documentAdapter.notifyDataSetChanged();
+            pDialog.dismiss();
+
+        }
+    }
+
 
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
@@ -319,6 +468,8 @@ public class HideDocumentActivity extends AppCompatActivity {
 
                 String path = getPath(HideDocumentActivity.this, mImageUri);
 
+                System.out.println("path "+path);
+
                 array_filename.add(path.substring(path.lastIndexOf("/") + 1));
 
                 byte[] content = getFile(path);
@@ -491,6 +642,27 @@ public class HideDocumentActivity extends AppCompatActivity {
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
+    private  File getOutputMediaFile(String extension){
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
+                + "/Hide It/");
 
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                return null;
+            }
+        }
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmssSSS").format(new Date());
+        File mediaFile;
+        String mImageName="MI_"+ timeStamp + extension;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
+        return mediaFile;
+    }
 
 }

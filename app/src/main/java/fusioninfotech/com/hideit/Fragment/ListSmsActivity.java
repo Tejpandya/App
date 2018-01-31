@@ -55,7 +55,7 @@ public class ListSmsActivity extends AppCompatActivity {
         new LoadSmsAyscn().execute();
 
         userDatabase = Room.databaseBuilder(getApplicationContext(),
-                UserDatabase.class, "sms-db").build();
+                UserDatabase.class, "Sms").build();
 
         btn_import_sms.setOnClickListener(new View.OnClickListener() {
             @Override

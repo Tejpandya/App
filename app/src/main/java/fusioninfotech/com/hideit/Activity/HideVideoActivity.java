@@ -62,30 +62,39 @@ public class HideVideoActivity extends AppCompatActivity {
     Key key;
     static Uri contentUri;
 
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hide_video);
-        
-        
-        init();
 
-        if (Constant.is_complete){
+        Bundle b = getIntent().getExtras();
 
-            try {
-                starting();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            new doSaveEncrypt().execute();
-        }
+                init();
+
+                try {
+                    if (b.getString("is_complete").equalsIgnoreCase("true")){
+
+                        try {
+                            System.out.println("Inside Try");
+                            starting();
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        } catch (InstantiationException e) {
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("Inside do save ");
+                        new doSaveEncrypt().execute();
+                    }
+                }catch (Exception e){
+                    System.out.println(" excpetion "+e);
+                }
+
+
 
     }
 
@@ -143,23 +152,11 @@ public class HideVideoActivity extends AppCompatActivity {
                 switch (menuItem.getItemId()) {
                     case R.id.restoreitem:
 
+                        new StoreImage().execute();
 
-                        File root_file = new File(myDir + "/decrypted/");
-
-                        File[] files = root_file.listFiles();
-
-                        System.out.println("file's array " + root_file.listFiles());
-
-                        System.out.println("file array size " + files.length);
-                        for (int i = 0; i < files.length; i++) {
-
-                            byte[] content = getFile(getPath(HideVideoActivity.this, Uri.fromFile(files[i])));
-                            System.out.println(content);
-
-                          storeImage(content);
-
-                        }
                         actionMode.finish();
+
+
                         return true;
                     default:
                         return false;
@@ -174,6 +171,28 @@ public class HideVideoActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void DeletefromData(int position){
+
+        System.out.println("my position "+position);
+
+        File root_file = new File(myDir + "/decrypted/videos/");
+        File root_file_encrypt = new File(myDir + "/encrypted/videos/");
+        File[] files = root_file.listFiles();
+        File[] files_encrypt = root_file_encrypt.listFiles();
+
+        System.out.println("file size "+files.length);
+        System.out.println("file encrypt size "+files_encrypt.length);
+
+
+        if (root_file.listFiles() != null) {
+            boolean isdelete =  files[position].delete();
+            files_encrypt[position].delete();
+            System.out.println("is delete "+isdelete);
+            Constant.videos_bitmap.remove(position);
+
+        }
     }
 
     private void storeImage(byte[] content) {
@@ -209,12 +228,68 @@ public class HideVideoActivity extends AppCompatActivity {
             }
         }
         // Create a media file name
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmssSSS").format(new Date());
         File mediaFile;
         String mImageName="MI_"+ timeStamp +".mp4";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
         return mediaFile;
     }
+
+
+
+    public class StoreImage extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+
+            SparseBooleanArray selected = videoAdapter.getSelectedIds();
+            for (int i = (selected.size() - 1); i >= 0; i--) {
+
+                if (selected.valueAt(i)) {
+                    File root_file = new File(myDir + "/decrypted/videos");
+
+                    File[] files = root_file.listFiles();
+
+                    System.out.println("file array size " + files.length);
+
+
+
+                        byte[] content = getFile(getPath(HideVideoActivity.this, Uri.fromFile(files[i])));
+                        System.out.println(content);
+
+                        storeImage(content);
+
+
+
+                    DeletefromData(selected.keyAt(i));
+
+                }
+            }
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            videoAdapter.notifyDataSetChanged();
+            pDialog.dismiss();
+
+        }
+    }
+
 
     public class doSaveEncrypt extends AsyncTask<String, String, String> {
 
@@ -351,6 +426,9 @@ public class HideVideoActivity extends AppCompatActivity {
         return content;
     }
 
+
+
+
     public static byte[] encryptPdfFile(Key key, byte[] content) {
         Cipher cipher;
         byte[] encrypted = null;
@@ -365,6 +443,9 @@ public class HideVideoActivity extends AppCompatActivity {
 
     }
 
+
+
+
     public static byte[] decryptPdfFile(Key key, byte[] textCryp) {
         Cipher cipher;
         byte[] decrypted = null;
@@ -378,6 +459,9 @@ public class HideVideoActivity extends AppCompatActivity {
 
         return decrypted;
     }
+
+
+
 
     public void saveFileencrypted(byte[] bytes, int count , String  extension) throws IOException {
         SimpleDateFormat s = new SimpleDateFormat("ddMMyyyyhhmmss");

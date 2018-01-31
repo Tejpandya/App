@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import java.nio.ByteBuffer;
+
 import fusioninfotech.com.hideit.Helper.Constant;
 import fusioninfotech.com.hideit.R;
 
@@ -29,12 +31,14 @@ public class VideoAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return Constant.selected_videos.size();
+        return Constant.videos_bitmap.size();
     }
 
     public Object getItem(int position) {
         return position;
     }
+
+
 
     public long getItemId(int position) {
         return position;
@@ -51,7 +55,10 @@ public class VideoAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        holder.img_gallery.setImageBitmap(Constant.videos_bitmap.get(position));
+
+            holder.img_gallery.setImageBitmap(Constant.videos_bitmap.get(position));
+
+
         return convertView;
     }
 

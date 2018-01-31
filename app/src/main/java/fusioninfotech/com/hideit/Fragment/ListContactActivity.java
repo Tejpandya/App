@@ -145,8 +145,6 @@ public class ListContactActivity extends AppCompatActivity {
             pd.cancel();
 
             contactAdapter = new ListContactAdapter(ListContactActivity.this, list_contact_model);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(ListContactActivity.this);
-            rv_contact.setLayoutManager(mLayoutManager);
             rv_contact.setItemAnimator(new DefaultItemAnimator());
             rv_contact.setAdapter(contactAdapter);
 
@@ -169,7 +167,7 @@ public class ListContactActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             // TODO Auto-generated method stub
 
-            /*for (int i = 0 ; i < Constant.Constant_list_contact_model.size();i++){
+            /*.0for (int i = 0 ; i < Constant.Constant_list_contact_model.size();i++){
                 if (Constant.Constant_list_contact_model.get(i).isIs_selected())
 
                 list_database_contact_model.add(Constant.Constant_list_contact_model.get(i));

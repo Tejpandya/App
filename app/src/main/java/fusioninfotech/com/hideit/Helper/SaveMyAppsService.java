@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class SaveMyAppsService extends Service {
     boolean noDelay = false;
     public static SaveMyAppsService instance;
     static SessionManager session;
-
+    static String strName = "";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -78,24 +79,61 @@ public class SaveMyAppsService extends Service {
                 // This method will check for the Running apps after every 100ms
                 Log.d("SERVICE ", "TOP APP : ---------" + getTopAppName(getApplicationContext()));
 
+
+                Constant.list_blocked_apps.clear();
+                Set<String> block_set = session.getBlockedList();
+                System.out.println("my fetched set "+block_set);
+
+                Constant.list_blocked_apps.addAll(block_set);
+
+                Set<String> fetch = session.getApplicationStatus();
+                List<String> list = new ArrayList<String>(fetch);
+
+                System.out.println("list whole value "+list);
+                System.out.println("contains or not  "+Constant.list_blocked_apps.contains(strName));
+
+
+
+
+                if (Constant.list_blocked_apps.contains(strName)){
+
+
+                    if (strName.contains(list.get(0)) && list.get(1).equals("true")) {
+                        Log.d("SERVICE","App has been unblock ");
+                    } else {
+                        Intent lockIntent = new Intent(getApplicationContext(), UnLockActivity.class);
+                        lockIntent.putExtra("app_name", strName);
+                        lockIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        lockIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(lockIntent);
+                        stop();
+
+                    }
+
+                }else {
+                    session.setApplicationStatus(strName, false);
+                }
+
             }
         }, 0, 2000, TimeUnit.MILLISECONDS);
     }
 
-
     public static String getTopAppName(Context context) {
         ActivityManager mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        String strName = "";
+
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 strName = getLollipopFGAppPackageName(context);
+
+
             } else {
                 strName = mActivityManager.getRunningTasks(1).get(0).topActivity.getClassName();
             }
 
             System.out.println("active task " + strName);
 
-         /*   if (strName .contains("camera")){
+           /* if (strName .contains("camera")){
                 Log.d("SERVICE","STOP :--------------");
                 Set<String> fetch =  session.getApplicationStatus();
                 List<String> list = new ArrayList<String>(fetch);
@@ -118,64 +156,13 @@ public class SaveMyAppsService extends Service {
                 session.setApplicationStatus(strName,false);
             }*/
 
-            Constant.list_blocked_apps.clear();
-            Set<String> block_set = session.getBlockedList();
-            System.out.println("my fetched set "+block_set);
 
-            Constant.list_blocked_apps.addAll(block_set);
-
-            Set<String> fetch = session.getApplicationStatus();
-            List<String> list = new ArrayList<String>(fetch);
-
-
-            System.out.println("list whole value "+list);
-
-            System.out.println("contains or not  "+Constant.list_blocked_apps.contains(strName));
-
-
-            if (Constant.list_blocked_apps.contains(strName)){
-
-
-                if (strName.contains(list.get(0)) && list.get(1).equals("true")) {
-                    Log.d("SERVICE","App has been unblock ");
-                } else {
-                    Intent lockIntent = new Intent(context, UnLockActivity.class);
-                    lockIntent.putExtra("app_name", strName);
-                    lockIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    lockIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(lockIntent);
-                }
-
-            }else {
-
-                session.setApplicationStatus(strName, false);
-            }
-
-
-
-           /* for (int i = 0; i < Constant.list_blocked_apps.size() ; i++) {
-
-                    Log.d("SERVICE","Im Inside FOR ");
-                System.out.println("my equall "+strName+""+Constant.list_blocked_apps.get(i));
-                System.out.println(" boolean "+strName.contains(Constant.list_blocked_apps.get(i)));
-
-                if (strName.contains(Constant.list_blocked_apps.get(i))) {
-
-
-
-                } else {
-                    Log.d("SERVICE","im in else part with app false status "+Constant.list_blocked_apps.get(i));
-                    session.setApplicationStatus(Constant.list_blocked_apps.get(i), false);
-                }
-
-            }
-*/
         } catch (Exception e) {
             e.printStackTrace();
         }
         return strName;
     }
+
 
 
     private static String getLollipopFGAppPackageName(Context ctx) {
@@ -184,6 +171,8 @@ public class SaveMyAppsService extends Service {
             UsageStatsManager usageStatsManager = (UsageStatsManager) ctx.getSystemService("usagestats");
             long milliSecs = 60 * 1000;
             Date date = new Date();
+
+
             List<UsageStats> queryUsageStats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, date.getTime() - milliSecs, date.getTime());
             if (queryUsageStats.size() > 0) {
                 Log.i("LPU", "queryUsageStats size: " + queryUsageStats.size());

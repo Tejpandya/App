@@ -23,8 +23,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activity.MainActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity
+            android:name=".Activity.MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".Activity.HideImagesActivity" />
         <activity android:name=".Activity.HideVideoActivity" />
         <activity android:name=".Activity.VideoPickerActivity" />
@@ -60,10 +61,10 @@
         </activity>
 
         <activity-alias
-            android:name=".Activity.INTRO_PASSWORD.ChoosePasswordPatternActivity_newalias"
-            android:enabled="false"
-            android:icon="@drawable/bg"
-            android:label="Hide IT BLUE"
+            android:name=".Activity.INTRO_PASSWORD.ChoosePasswordPatternActivity_alias"
+            android:enabled="true"
+            android:icon="@drawable/ic_pattern"
+            android:label="Hide IT RED"
             android:targetActivity=".Activity.INTRO_PASSWORD.ChoosePasswordPatternActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -72,10 +73,10 @@
             </intent-filter>
         </activity-alias>
         <activity-alias
-            android:name=".Activity.INTRO_PASSWORD.ChoosePasswordPatternActivity_alias"
-            android:enabled="true"
-            android:icon="@drawable/ic_pattern"
-            android:label="Hide IT RED"
+            android:name=".Activity.INTRO_PASSWORD.ChoosePasswordPatternActivity_newalias"
+            android:enabled="false"
+            android:icon="@drawable/bg"
+            android:label="Hide IT BLUE"
             android:targetActivity=".Activity.INTRO_PASSWORD.ChoosePasswordPatternActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -88,7 +89,7 @@
         <activity android:name=".Activity.SettingActivity" />
         <activity android:name=".Activity.ContactSmsActivity" />
         <activity android:name=".Activity.UnLockActivity" />
-        <activity android:name=".Activity.HideDocumentActivity"></activity>
+        <activity android:name=".Activity.HideDocumentActivity" />
     </application>
 
 </manifest>

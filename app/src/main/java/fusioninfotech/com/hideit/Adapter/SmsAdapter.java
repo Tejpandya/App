@@ -9,15 +9,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import fusioninfotech.com.hideit.R;
 
-/**
- * Created by MAIN on 08-12-2017.
- */
+
 
 public class SmsAdapter extends BaseAdapter {
 
@@ -46,7 +45,7 @@ public class SmsAdapter extends BaseAdapter {
     }
 
     public String getName(int i) {
-        return arrayList.get(i).get("name");
+        return arrayList.get(i).get("body");
     }
 
 
@@ -64,13 +63,14 @@ public class SmsAdapter extends BaseAdapter {
 
             holder.tv_contactname = (TextView) itemView.findViewById(R.id.tv_contactname);
             holder.tv_contactnumber = (TextView) itemView.findViewById(R.id.tv_number);
+
             itemView.setTag(holder);
         } else {
             holder = (ViewHolder) itemView.getTag();
         }
 
-        holder.tv_contactnumber.setText(arrayList.get(position).get("number"));
-        holder.tv_contactname.setText(arrayList.get(position).get("name"));
+        holder.tv_contactnumber.setText(arrayList.get(position).get("body"));
+        holder.tv_contactname.setText(arrayList.get(position).get("number"));
 
         return itemView;
     }
@@ -78,7 +78,7 @@ public class SmsAdapter extends BaseAdapter {
 
     private class ViewHolder {
 
-        CheckBox checkbox;
+
         TextView tv_contactname, tv_contactnumber;
 
 

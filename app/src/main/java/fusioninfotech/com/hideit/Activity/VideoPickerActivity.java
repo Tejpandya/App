@@ -86,10 +86,11 @@ public class VideoPickerActivity extends AppCompatActivity {
 
             }
 
-            Constant.is_complete = true;
+
             System.out.println("selected array bitmap "+Constant.videos_bitmap);
 
             Intent i = new Intent(VideoPickerActivity.this,HideVideoActivity.class);
+            i.putExtra("is_complete","true");
             startActivity(i);
             finish();
 
